@@ -1,5 +1,5 @@
 # Table of contents
 
-* [CheeSwap REST API documentation](README.md)
+* [REST API  CheeseSwap](README.md)
 * [CheeSwap REST API documentation](docs.md)
 
