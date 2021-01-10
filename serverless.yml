@@ -1,0 +1,107 @@
+service: rest-api
+app: cheeseswap-api
+org: cheeseswap
+
+
+
+
+provider:
+  name: aws
+  endpointType: REGIONAL
+  runtime: nodejs12.x
+  memorySize: 320 # optional, in MB, default is 1024
+  timeout: 20 # optional, in seconds, default is 6
+  logRetentionInDays: 1
+  
+  usagePlan:
+    - low: # 5 QPS
+        quota:
+          limit: 500000 # 5 * 60 * 60 * 24
+          period: DAY
+        throttle:
+          burstLimit: 10
+          rateLimit: 5
+    - medium: # 50 QPS
+        quota:
+          limit: 5000000 # 50 * 60 * 60 * 24 rounded up
+          period: DAY
+        throttle:
+          burstLimit: 100
+          rateLimit: 50
+    - high: # 100 QPS
+        quota:
+          limit: 10000000 # 100 * 60 * 60 * 24 rounded up
+          period: DAY
+        throttle:
+          burstLimit: 200
+          rateLimit: 100
+
+custom:
+  customDomain:
+    domainName: cheeseswap.info
+    basePath: ''
+    stage: prod
+    createRoute53Record: true
+  apiGatewayCaching:
+    enabled: true
+    clusterSize: '0.5' # defaults to '0.5'
+    ttlInSeconds: 300 # defaults to the maximum allowed: 3600
+  contentEncoding:
+    minimumCompressionSize: 0 # Minimum body size required for compression in bytes
+  
+    
+plugins:
+  - serverless-plugin-typescript
+  - serverless-api-gateway-caching
+  - serverless-content-encoding
+  - serverless-domain-manager
+
+functions:
+ 
+   v2-tickers:
+    handler: src/v2/tickers.handler
+    events:
+      - http:
+          method: get
+          path: /v2/tickers
+          private: false
+          caching:
+            enabled: true
+            ttlInSeconds: 60
+
+   v2-assets:
+    handler: src/v2/assets.handler
+    events:
+      - http:
+          method: get
+          path: /v2/assets
+          private: false
+          caching:
+            enabled: true
+            ttlInSeconds: 3600
+
+   v2-orderbook:
+    handler: src/v2/orderbook.handler
+    events:
+      - http:
+          method: get
+          path: "/v2/orderbook/{pair}"
+          private: false
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.path.pair
+            ttlInSeconds: 3600
+
+   v2-trades:
+    handler: src/v2/trades.handler
+    events:
+      - http:
+          method: get
+          path: "/v2/trades/{pair}"
+          private: false
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.path.pair
+            ttlInSeconds: 900

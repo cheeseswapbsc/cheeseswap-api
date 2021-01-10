@@ -1,0 +1,15 @@
+{
+  "name": "Uniswap V2",
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Uniswap V2": {
+        "url": "https://graph.chipsfryer.world/subgraphs/name/blockartist/cheesegraph3",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      }
+    }
+  }
+}
